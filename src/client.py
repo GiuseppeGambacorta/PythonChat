@@ -35,11 +35,11 @@ print('Connected to server')
 
 thread = threading.Thread(target=printResponses)
 thread.daemon = True
-thread.start()
-
 
 thread2 = threading.Thread(target=writeMessages)
 thread2.daemon = True
+
+thread.start()
 thread2.start()
 
 
