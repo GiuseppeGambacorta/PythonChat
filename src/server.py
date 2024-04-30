@@ -1,6 +1,7 @@
 import sys
 import socket
 import threading
+import signal
 
 
 def addClients():
@@ -24,6 +25,12 @@ def manageClient(index):
                 if client == clients[index]:
                     continue
                 client.send(response)
+                
+                
+def signal_handler(sig, frame):
+    print('Exiting...')
+    server.close()
+    sys.exit(0)
 
 
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -36,14 +43,15 @@ clients = []
 clients_lock = threading.Lock()
 
 print ('Ready to serve...')
-threading.Thread(target=addClients).start()
+thread = threading.Thread(target=addClients)
+thread.daemon = True
+thread.start()
 
 
 print('Waiting for clients...')
-while True:
-    pass
-
-
-
+#interrompe l’esecuzione se da tastiera arriva la sequenza (CTRL + C) 
+signal.signal(signal.SIGINT, signal_handler)
+signal.pause()
     
-server.close()
+    
+
