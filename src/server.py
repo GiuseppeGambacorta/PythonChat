@@ -12,14 +12,15 @@ print("Server in ascolto su porta 8888...")
 # Lista per tenere traccia dei client connessi
 clients = []
 
+print ('Ready to serve...')
+connectionSocket, addr = server.accept() # Si ferma qui in attesa di una connessione, mi rida indietro l'indirizzo del client
+print(connectionSocket,addr)
+clients.append(connectionSocket)
+print(f'Connected to {addr}')
 
 while True:
 
-    print ('Ready to serve...')
-    connectionSocket, addr = server.accept() # Si ferma qui in attesa di una connessione, mi rida indietro l'indirizzo del client
-    print(connectionSocket,addr)
-    clients.append(connectionSocket)
-    print(f'Connected to {addr}')
+
     responde = clients[0].recv(4096)
     print(responde.decode())
 
