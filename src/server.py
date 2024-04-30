@@ -19,8 +19,10 @@ def manageClient(index):
         response = clients[index].recv(4096)
         print(response.decode())
         
-        message=input('Inserisci un messaggio: ')
-        clients[index].send(message.encode())
+        for client in clients:
+            if client == clients[index]:
+                continue
+            client.send(response)
 
 
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
