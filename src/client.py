@@ -5,7 +5,7 @@ import socket
 client=socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 try:
-    client.connect(('localhost', 8887))
+    client.connect(('localhost', 8888))
 except Exception as e:
     print(f'Errore di connessione: {e}')
     sys.exit(0)
@@ -21,6 +21,7 @@ while True:
 
     response=client.recv(4096)
     print(response.decode())
+
 
 
 

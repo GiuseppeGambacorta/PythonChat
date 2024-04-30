@@ -1,31 +1,44 @@
 import sys
 import socket
+import threading
 
+
+def addClients():
+    while True:
+        connectionSocket, addr = server.accept() 
+        with clients_lock:
+            clients.append(connectionSocket)
+            threading.Thread(target=manageClient, args=(len(clients) - 1,)).start()
+        print(f'Connected to {addr}')
+
+def manageClient(index):
+    while True:
+        if len(clients) == 0:
+            break
+
+        response = clients[index].recv(4096)
+        print(response.decode())
+        
+        message=input('Inserisci un messaggio: ')
+        clients[index].send(message.encode())
 
 
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-server.bind(('localhost', 8887))
+server.bind(('localhost', 8888))
 server.listen(5)  # Accetta fino a 5 connessioni in sospeso
-
 print("Server in ascolto su porta 8888...")
 
 # Lista per tenere traccia dei client connessi
 clients = []
+clients_lock = threading.Lock()
 
 print ('Ready to serve...')
-connectionSocket, addr = server.accept() # Si ferma qui in attesa di una connessione, mi rida indietro l'indirizzo del client
-print(connectionSocket,addr)
-clients.append(connectionSocket)
-print(f'Connected to {addr}')
+threading.Thread(target=addClients).start()
 
+
+print('Waiting for clients...')
 while True:
-
-
-    responde = clients[0].recv(4096)
-    print(responde.decode())
-
-    message=input('Inserisci un messaggio: ')
-    clients[0].send(message.encode())
+    pass
 
 
 
