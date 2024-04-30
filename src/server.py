@@ -19,10 +19,11 @@ def manageClient(index):
         response = clients[index].recv(4096)
         print(response.decode())
         
-        for client in clients:
-            if client == clients[index]:
-                continue
-            client.send(response)
+        with clients_lock:
+            for client in clients:
+                if client == clients[index]:
+                    continue
+                client.send(response)
 
 
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
