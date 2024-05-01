@@ -8,7 +8,11 @@ class ChatClient:
         self.master = master
         self.master.title("Client")
         self.master.protocol("WM_DELETE_WINDOW", self.on_closing)
+        
+        
         self.client = client
+        self.connected = False
+
         
         self.server_port = tk.Entry(master, width=40)
         self.server_port.grid(row=0, column=0, padx=10, pady=10)
@@ -36,8 +40,8 @@ class ChatClient:
     def connect(self):
         port = self.server_port.get()
         if len(port) > 0:
-            connected = self.client.connect("localhost", int(port))
-            if connected:
+            self.connected = self.client.connect("localhost", int(port))
+            if self.connected:
                 self.status_text.config(text='connected')  # Abilita la modifica del testo
                 self.message_entry.grid(row=3, column=0, padx=10, pady=10)
                 self.send_button.grid(row=3, column=1, padx=10, pady=10)
@@ -49,8 +53,9 @@ class ChatClient:
        
 
     def disconnect(self):
-        self.client.disconnect()
-        self.status_text.config(text='disconnected')
+        if self.connected:
+            self.client.disconnect()
+            self.status_text.config(text='disconnected')
             
     def write_message_to_server(self):
         message=self.message_entry.get()
@@ -66,7 +71,7 @@ class ChatClient:
 
 
     def on_closing(self):
-        self.client.disconnect()
+        self.disconnect()
         self.master.destroy()
         
       
