@@ -9,22 +9,23 @@ def addClients():
         connectionSocket, addr = server.accept() 
         with clients_lock:
             clients.append(connectionSocket)
-            threading.Thread(target=manageClient, args=(len(clients) - 1,)).start()
+            print("wewe")
+            threading.Thread(target=manageClient, args=(connectionSocket,)).start()
         print(f'Connected to {addr}')
 
-def manageClient(index):
+def manageClient(client):
     while True:
         if len(clients) == 0:
             break
 
-        response = clients[index].recv(4096)
+        response = client.recv(4096)
         print(response.decode())
         
         with clients_lock:
-            for client in clients:
-                if client == clients[index]:
+            for otherClient in clients:
+                if otherClient == client:
                     continue
-                client.send(response)
+                otherClient.send(response)
                 
                 
 def signal_handler(sig, frame):
