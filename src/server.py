@@ -21,6 +21,7 @@ def manageClient(client):
        
 
 def addMessages(client):
+    local_queue = queue.Queue()
     while True:
         response = client.recv(4096)
         print(response.decode())
@@ -63,9 +64,7 @@ clients = []
 clients_lock = threading.Lock()
 
 messages = queue.Queue()
-messages_lock = threading.Lock()
-
-messages_condition = threading.Condition(messages_lock)
+messages_condition = threading.Condition()
 
 
 
