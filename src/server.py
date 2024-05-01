@@ -3,6 +3,7 @@ import socket
 import threading
 import signal
 import queue
+import time
 
 
 class Client:
@@ -40,6 +41,7 @@ def addClients():
 def sendMessages():
     while True:
         if messages.empty():
+            time.sleep(0.1)
             with clients_lock:
                 for client in clients:
                     with client.local_messages_lock:
