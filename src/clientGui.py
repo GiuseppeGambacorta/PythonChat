@@ -7,6 +7,7 @@ class ChatClient:
     def __init__(self, master, client):
         self.master = master
         self.master.title("Client")
+        self.master.protocol("WM_DELETE_WINDOW", self.on_closing)
         self.client = client
         
         self.server_port = tk.Entry(master, width=40)
@@ -62,6 +63,11 @@ class ChatClient:
             response = self.client.printResponses()
             self.chat_history.config(state='normal')
             self.chat_history.insert(tk.END, response.decode() + "\n")
+
+
+    def on_closing(self):
+        self.client.disconnect()
+        self.master.destroy()
         
       
     
