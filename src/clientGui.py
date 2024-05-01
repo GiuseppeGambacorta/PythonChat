@@ -29,7 +29,7 @@ class ChatClient:
         
         self.message_entry = tk.Entry(master, width=40)
         
-        self.send_button = tk.Button(master, text="Send", command=self.write_message)
+        self.send_button = tk.Button(master, text="Send", command=self.write_message_to_server)
        
 
 
@@ -52,7 +52,7 @@ class ChatClient:
         self.client.disconnect()
         self.status_text.config(text='disconnected')
             
-    def write_message(self):
+    def write_message_to_server(self):
         message=self.message_entry.get()
         self.client.writeMessages(message)
         self.chat_history.config(state='normal')  # Abilita la modifica del testo

@@ -10,6 +10,7 @@ class Client:
 
     def connect(self, address, port):
         try:
+            self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self.client.connect((address, port))
             return True
         except Exception as e:
