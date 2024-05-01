@@ -3,8 +3,10 @@ import socket
 import threading
 import signal
 import queue
+import messages_struct
+import struct
 import time
-
+from datetime import datetime
 
 class Client:
 
@@ -20,6 +22,11 @@ class Client:
     def listenMessages(self):
          while True:
             response = self.connectionSocket.recv(4096)
+            size = struct.calcsize(messages_struct.format)
+            unpacked_data=struct.unpack(messages_struct.format,response[0:size])
+            print(unpacked_data)
+            print(datetime.fromtimestamp(unpacked_data[1]))
+            response= response[size:]
             with self.local_messages_lock:
                 self.local_messages.put(response)
 
@@ -80,7 +87,12 @@ class Server:
         sys.exit(0)
 
 if __name__ == '__main__':
-    server = Server('localhost',8888)
+
+    if len(sys.argv) > 1:
+        port = int(sys.argv[1])
+    else:
+        port = 8888
+    server = Server('localhost',port)
     thread = threading.Thread(target=server.addClients)
     thread.daemon = True
     thread.start()

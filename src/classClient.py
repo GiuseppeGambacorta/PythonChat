@@ -2,6 +2,9 @@ import sys
 import socket
 import threading
 import signal
+import messages_struct
+import struct
+import time
 
 
 class Client:
@@ -34,7 +37,11 @@ class Client:
 
     def writeMessages(self, message):
         try:
-            self.client.send(message.encode())
+            name = 'Giuseppe'.ljust(20).encode()
+            send=(True,time.time(),name)
+            data = struct.pack(messages_struct.format, *send)
+            data = data + message.encode()
+            self.client.send(data)
         except Exception as e:
             print(f'Errore di connessione: {e}')
             sys.exit(0)
