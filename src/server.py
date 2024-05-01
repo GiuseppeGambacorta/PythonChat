@@ -27,71 +27,69 @@ class Client:
         self.connectionSocket.send(message)
 
 
-def addClients():
-    while True:
-        connectionSocket, addr = server.accept() 
-        client = Client(connectionSocket, addr)
-        with clients_lock:
-            clients.append(client)
-            threading.Thread(target=client.listenMessages).start()
-        print(f'Connected to {addr}')
+class Server:
 
+    def __init__(self,ip_address, port):
+        self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.server.bind((ip_address, port))
+        self.server.listen(5)  # Accetta fino a 5 connessioni in sospeso
+        
 
-            
-def sendMessages():
-    while True:
-        if messages.empty():
-            time.sleep(0.1)
-            with clients_lock:
-                for client in clients:
-                    with client.local_messages_lock:
-                        while not client.local_messages.empty():
-                            response = client.local_messages.get()
-                            messages.put((response, client))
-        else:
-                with clients_lock:
-                    while not messages.empty():
-                        message, client_from_queue = messages.get()
-                        for client in clients:
+        self.clients = []
+        self.clients_lock = threading.Lock()
+        self.messages = queue.Queue()
+
+        print(f"Server listening on port {port}...")
+
+    def addClients(self):
+        while True:
+            connectionSocket, addr = self.server.accept()
+            client = Client(connectionSocket, addr)
+            with self.clients_lock:
+                self.clients.append(client)
+                threading.Thread(target=client.listenMessages).start()
+            print(f'Connected to {addr}')
+
+    def sendMessages(self):
+        while True:
+            if self.messages.empty():
+                time.sleep(0.1)
+                with self.clients_lock:
+                    for client in self.clients:
+                        with client.local_messages_lock:
+                            while not client.local_messages.empty():
+                                response = client.local_messages.get()
+                                self.messages.put((response, client))
+            else:
+                with self.clients_lock:
+                    while not self.messages.empty():
+                        message, client_from_queue = self.messages.get()
+                        for client in self.clients:
                             if client != client_from_queue:
                                 client.send(message)
-                            
 
-                
-                
-def signal_handler(sig, frame):
-    print('Exiting...')
-    server.close()
-    sys.exit(0)
+    def start(self):
+        print('Waiting for clients...')
+        # interrompe l’esecuzione se da tastiera arriva la sequenza (CTRL + C)
+        signal.signal(signal.SIGINT, self.signal_handler)
+        signal.pause()
 
+    def signal_handler(self, sig, frame):
+        print('Exiting...')
+        self.server.close()
+        sys.exit(0)
 
-server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-server.bind(('localhost', 8888))
-server.listen(5)  # Accetta fino a 5 connessioni in sospeso
-print("Server in ascolto su porta 8888...")
+if __name__ == '__main__':
+    server = Server('localhost',8888)
+    thread = threading.Thread(target=server.addClients)
+    thread.daemon = True
+    thread.start()
 
-# Lista per tenere traccia dei client connessi
-clients = []
-clients_lock = threading.Lock()
-messages = queue.Queue()
+    thread2 = threading.Thread(target=server.sendMessages)
+    thread2.daemon = True
+    thread2.start()
 
+    server.start()
 
-print ('Ready to serve...')
-thread = threading.Thread(target=addClients)
-thread.daemon = True
-thread.start()
-
-thread2 = threading.Thread(target=sendMessages)
-thread2.daemon = True
-thread2.start()
-
-
-
-
-print('Waiting for clients...')
-#interrompe l’esecuzione se da tastiera arriva la sequenza (CTRL + C) 
-signal.signal(signal.SIGINT, signal_handler)
-signal.pause()
-    
     
 
