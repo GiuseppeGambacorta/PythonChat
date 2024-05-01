@@ -14,7 +14,6 @@ def addClients():
         print(f'Connected to {addr}')
 
 def manageClient(client):
-
    addMessages(client)
 
 
@@ -25,15 +24,19 @@ def addMessages(client):
     while True:
         response = client.recv(4096)
         print(response.decode())
-        with messages_lock:
+        with messages_condition:
             messages.put((response, client))
+            messages_condition.notify()
             
 
 
 def sendMessages():
     while True:
-        with messages_lock:
-            if not messages.empty() and  len(clients) > 0:
+        with messages_condition:
+            while messages.empty():
+                messages_condition.wait()
+
+            if len(clients) > 0:
                 with clients_lock:
                     while not messages.empty():
                         message, client_from_queue = messages.get()
@@ -61,6 +64,10 @@ clients_lock = threading.Lock()
 
 messages = queue.Queue()
 messages_lock = threading.Lock()
+
+messages_condition = threading.Condition(messages_lock)
+
+
 
 print ('Ready to serve...')
 thread = threading.Thread(target=addClients)
