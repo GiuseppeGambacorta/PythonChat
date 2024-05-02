@@ -10,6 +10,7 @@ import time
 class Client:
     def __init__(self):
         self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.structure_manager = messages_struct.structManager()
 
     def connect(self, address, port):
         try:
@@ -38,9 +39,9 @@ class Client:
     def writeMessages(self, message):
         try:
             name = 'Giuseppe'.ljust(20).encode()
-            send=(True,time.time(),name)
-            data = struct.pack(messages_struct.format, *send)
-            data = data + message.encode()
+            structure_to_send=(True,time.time(),name)
+            data = self.structure_manager.write(structure_to_send, message)
+            print(f'data: {data}')
             self.client.send(data)
         except Exception as e:
             print(f'Errore di connessione: {e}')

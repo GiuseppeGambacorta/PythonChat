@@ -22,11 +22,7 @@ class Client:
     def listenMessages(self):
          while True:
             response = self.connectionSocket.recv(4096)
-            size = struct.calcsize(messages_struct.format)
-            unpacked_data=struct.unpack(messages_struct.format,response[0:size])
-            print(unpacked_data)
-            print(datetime.fromtimestamp(unpacked_data[1]))
-            response= response[size:]
+    
             with self.local_messages_lock:
                 self.local_messages.put(response)
 
@@ -45,6 +41,8 @@ class Server:
         self.clients = []
         self.clients_lock = threading.Lock()
         self.messages = queue.Queue()
+
+        self.structure_manager = messages_struct.structManager()
 
         print(f"Server listening on port {port}...")
 
@@ -71,6 +69,7 @@ class Server:
                 with self.clients_lock:
                     while not self.messages.empty():
                         message, client_from_queue = self.messages.get()
+                        structure_data, message= self.structure_manager.read_and_print_data(message)
                         for client in self.clients:
                             if client != client_from_queue:
                                 client.send(message)
