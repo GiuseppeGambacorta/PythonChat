@@ -1,13 +1,14 @@
 import struct
 
-
-format = '?d20s'
-
 class structManager:
+    MAX_STRING_LENGTH = 20
+
     def __init__(self):
-        self.format = '?d20s'
+        self.format = f'?d{self.MAX_STRING_LENGTH}s'
         self.struct_size = struct.calcsize(self.format)
-        print(f'struct size: {self.struct_size}')
+
+    def get_max_string_length(self):
+        return self.MAX_STRING_LENGTH
 
     def read(self,data):
         structure_data = struct.unpack(self.format, data[0:self.struct_size])
@@ -24,4 +25,3 @@ class structManager:
         data = struct.pack(self.format, *structure_data)
         data = data + message.encode()
         return data
-

@@ -68,10 +68,11 @@ class Server:
             else:
                 with self.clients_lock:
                     while not self.messages.empty():
-                        message, client_from_queue = self.messages.get()
-                        structure_data, message= self.structure_manager.read_and_print_data(message)
+                        message, client_that_writed_message = self.messages.get()
+                        structure_data, message= self.structure_manager.read(message)
+                        print(f'structure data: {structure_data}')
                         for client in self.clients:
-                            if client != client_from_queue:
+                            if client != client_that_writed_message:
                                 client.send(message)
 
     def start(self):
