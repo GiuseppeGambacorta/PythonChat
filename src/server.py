@@ -26,6 +26,7 @@ class Client:
                 with clients_lock:
                     print(f'Disconnected from {self.addr}')
                     clients.remove(self)  # rimuove se stesso dalla lista dei client
+                    print(f'Number of Clients: {len(self.clients)}')
                 break
               
             with self.local_messages_lock:
@@ -59,6 +60,7 @@ class Server:
                 self.clients.append(client)
                 threading.Thread(target=client.listenMessages, args=(self.clients, self.clients_lock)).start()
             print(f'Connected to {addr}')
+            print(f'Number of Clients: {len(self.clients)}')
 
     def sendMessages(self):
         while True:
@@ -74,8 +76,6 @@ class Server:
                 with self.clients_lock:
                     while not self.messages.empty():
                         message, client_that_writed_message = self.messages.get()
-                        structure_data, message= self.structure_manager.read(message)
-                        print(f'structure data: {structure_data}')
                         for client in self.clients:
                                 client.send(message)
 

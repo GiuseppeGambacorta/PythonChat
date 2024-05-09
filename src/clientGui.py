@@ -102,14 +102,20 @@ class ChatClient:
     def print_response(self):
         try:
             while self.connected:
-                response = self.client.printResponses()
+                structure_data,response = self.client.printResponses()
                 self.chat_history.config(state='normal')
-                self.chat_history.insert(tk.END, response.decode() + "\n")
+                if str(structure_data[2].decode()).strip() == self.nickname:
+                    self.chat_history.insert(tk.END, "You: " + response.decode() + "\n")
+                else:
+                    self.chat_history.insert(tk.END, str(structure_data[2].decode()).strip() + ": " + response.decode() + "\n")
                 self.status_text.see(tk.END)  
                 self.chat_history.config(state='disabled')
         except Exception as e:
             if self.connected:
                 self.write_status(f'Error: {e}')
+                self.connected = False
+                self.client.disconnect()
+                self.write_status('disconnected')
 
     def set_nickname(self):
         name = self.nickname_input.get().strip()

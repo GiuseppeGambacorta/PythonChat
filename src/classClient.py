@@ -36,7 +36,7 @@ class Client:
 
     def printResponses(self):
         try:
-            return self.client.recv(4096)
+            return self.structure_manager.read(self.client.recv(4096))   
         except Exception as e:
             if self.guimode:
                 raise
