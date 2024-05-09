@@ -33,7 +33,10 @@ class Client:
                 self.local_messages.put(response)
 
     def send(self, message):
-        self.connectionSocket.send(message)
+        try:
+            self.connectionSocket.send(message)
+        except Exception as e:
+            print(f'Error: {e}')
 
 
 class Server:
@@ -71,11 +74,11 @@ class Server:
                         with client.local_messages_lock:
                             while not client.local_messages.empty():
                                 response = client.local_messages.get()
-                                self.messages.put((response, client))
+                                self.messages.put(response)
             else:
                 with self.clients_lock:
                     while not self.messages.empty():
-                        message, client_that_writed_message = self.messages.get()
+                        message = self.messages.get()
                         for client in self.clients:
                                 client.send(message)
 
