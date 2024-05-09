@@ -76,7 +76,7 @@ class Server:
                                 response = client.local_messages.get()
                                 self.messages.put(response)
             else:
-                with self.clients_lock:
+                with self.clients_lock:                    
                     while not self.messages.empty():
                         message = self.messages.get()
                         for client in self.clients:

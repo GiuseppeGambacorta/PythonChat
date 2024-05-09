@@ -10,13 +10,13 @@ class structManager:
     def get_max_string_length(self):
         return self.MAX_STRING_LENGTH
 
-    def read(self,data):
+    def unpack(self,data):
         structure_data = struct.unpack(self.format, data[0:self.struct_size])
         data = data[self.struct_size:]
         return structure_data,data
 
     def read_and_print_data(self, data):
-        structure_data, message = self.read(data)
+        structure_data, message = self.unpack(data)
         
         return structure_data, message
 

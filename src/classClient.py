@@ -34,9 +34,9 @@ class Client:
                 print(f'Errore di connessione: {e}')
                 return False
 
-    def printResponses(self):
+    def readResponses(self):
         try:
-            return self.structure_manager.read(self.client.recv(4096))   
+            return self.structure_manager.unpack(self.client.recv(4096))   
         except Exception as e:
             if self.guimode:
                 raise

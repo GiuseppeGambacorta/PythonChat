@@ -102,7 +102,7 @@ class ChatClient:
     def print_response(self):
         try:
             while self.connected:
-                structure_data,response = self.client.printResponses()
+                structure_data,response = self.client.readRespondes()
                 self.chat_history.config(state='normal')
                 datatime = time.strftime('%H:%M:%S', time.localtime(structure_data[1]))
                 if str(structure_data[2].decode()).strip() == self.nickname:
