@@ -54,15 +54,15 @@ class ChatClient:
                         self.connected = self.client.connect("localhost", int(port))
                         if self.connected:
                             self.write_status('connected')
-                            thread = threading.Thread(target=self.print_response)
-                            thread.daemon = True
-                            thread.start()
+                            self.thread_response = threading.Thread(target=self.print_response)
+                            self.thread_response.daemon = True
+                            self.thread_response.start()
                         else:
                             self.write_status('connection failed')
                     else:
                         self.write_status('insert port')
                 else:
-                    self.write_status('insert nickname')
+                    self.write_status('set a nickname first')
             except Exception as e:
                 self.write_status(f'Error: {e}')
         else:
@@ -72,12 +72,13 @@ class ChatClient:
     def disconnect(self):
         try:
             if self.connected:
+                self.connected = False
                 self.client.disconnect()
                 self.write_status('disconnected')
-                self.connected = False
                 self.nickname_selected = False
+
         except Exception as e:
-            self.write_status(f'Error: {e}')
+            self.write_status(f'Error: {e} ')
             
     def write_message_to_server(self):
         try:
@@ -85,8 +86,6 @@ class ChatClient:
                 message=self.message_entry.get()
                 self.message_entry.delete(0, tk.END)
                 self.client.writeMessages(self.nickname, message)
-             #   self.chat_history.config(state='normal')  # Abilita la modifica del testo
-             #   self.chat_history.insert(tk.END, message+"\n")  # Aggiunge il messaggio alla fine della finestra di chat
             else:
                 self.write_status('cant send messages if not connected')
         except Exception as e:
@@ -102,14 +101,15 @@ class ChatClient:
 
     def print_response(self):
         try:
-            while True:
+            while self.connected:
                 response = self.client.printResponses()
                 self.chat_history.config(state='normal')
                 self.chat_history.insert(tk.END, response.decode() + "\n")
                 self.status_text.see(tk.END)  
                 self.chat_history.config(state='disabled')
         except Exception as e:
-            self.write_status(f'Error: {e}')
+            if self.connected:
+                self.write_status(f'Error: {e}')
 
     def set_nickname(self):
         name = self.nickname_input.get().strip()
@@ -120,7 +120,7 @@ class ChatClient:
             self.nickname_input.config(textvariable=self.nickname)
         else:
             if name_len == 0:
-                self.write_status('insert nickname')
+                self.write_status('insert a nickname in the field')
             else:
                 self.write_status('nickname too long')
 

@@ -4,7 +4,6 @@ import threading
 import signal
 import queue
 import messages_struct
-import struct
 import time
 from datetime import datetime
 
@@ -19,10 +18,16 @@ class Client:
         self.local_messages_lock = threading.Lock()
 
         
-    def listenMessages(self):
-         while True:
-            response = self.connectionSocket.recv(4096)
-    
+    def listenMessages(self, clients, clients_lock):
+        while True:
+            try:
+                response = self.connectionSocket.recv(4096)
+            except Exception as e:  
+                with clients_lock:
+                    print(f'Disconnected from {self.addr}')
+                    clients.remove(self)  # rimuove se stesso dalla lista dei client
+                break
+              
             with self.local_messages_lock:
                 self.local_messages.put(response)
 
@@ -52,7 +57,7 @@ class Server:
             client = Client(connectionSocket, addr)
             with self.clients_lock:
                 self.clients.append(client)
-                threading.Thread(target=client.listenMessages).start()
+                threading.Thread(target=client.listenMessages, args=(self.clients, self.clients_lock)).start()
             print(f'Connected to {addr}')
 
     def sendMessages(self):
