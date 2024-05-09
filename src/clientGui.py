@@ -84,8 +84,9 @@ class ChatClient:
         try:
             if self.connected:
                 message=self.message_entry.get()
-                self.message_entry.delete(0, tk.END)
-                self.client.writeMessages(self.nickname, message)
+                if len(message) > 0:
+                    self.message_entry.delete(0, tk.END)
+                    self.client.writeMessages(self.nickname, message)
             else:
                 self.write_status('cant send messages if not connected')
         except Exception as e:
@@ -102,7 +103,7 @@ class ChatClient:
     def print_response(self):
         try:
             while self.connected:
-                structure_data,response = self.client.readRespondes()
+                structure_data,response = self.client.readResponses()
                 self.chat_history.config(state='normal')
                 datatime = time.strftime('%H:%M:%S', time.localtime(structure_data[1]))
                 if str(structure_data[2].decode()).strip() == self.nickname:

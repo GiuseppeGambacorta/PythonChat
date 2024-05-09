@@ -76,11 +76,17 @@ class Server:
                                 response = client.local_messages.get()
                                 self.messages.put(response)
             else:
-                with self.clients_lock:                    
+                with self.clients_lock:             
+                    datastore =[]       
                     while not self.messages.empty():
                         message = self.messages.get()
+                        data_structure,data = self.structure_manager.unpack(message)
+                        datastore.append((data_structure[1], message))
+                    datastore.sort(key=lambda x: x[0])
+
+                    for time_stamp, message in datastore:
                         for client in self.clients:
-                                client.send(message)
+                            client.send(message)
 
     def start(self):
         print('Waiting for clients...')
