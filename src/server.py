@@ -26,7 +26,7 @@ class Client:
                 with clients_lock:
                     print(f'Disconnected from {self.addr}')
                     clients.remove(self)  # rimuove se stesso dalla lista dei client
-                    print(f'Number of Clients: {len(self.clients)}')
+                    print(f'Number of Clients: {len(clients)}')
                 break
               
             with self.local_messages_lock:
