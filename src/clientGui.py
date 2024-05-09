@@ -85,8 +85,8 @@ class ChatClient:
                 message=self.message_entry.get()
                 self.message_entry.delete(0, tk.END)
                 self.client.writeMessages(self.nickname, message)
-                self.chat_history.config(state='normal')  # Abilita la modifica del testo
-                self.chat_history.insert(tk.END, message+"\n")  # Aggiunge il messaggio alla fine della finestra di chat
+             #   self.chat_history.config(state='normal')  # Abilita la modifica del testo
+             #   self.chat_history.insert(tk.END, message+"\n")  # Aggiunge il messaggio alla fine della finestra di chat
             else:
                 self.write_status('cant send messages if not connected')
         except Exception as e:

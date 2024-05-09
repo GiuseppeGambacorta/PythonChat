@@ -72,7 +72,6 @@ class Server:
                         structure_data, message= self.structure_manager.read(message)
                         print(f'structure data: {structure_data}')
                         for client in self.clients:
-                            if client != client_that_writed_message:
                                 client.send(message)
 
     def start(self):
