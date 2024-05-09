@@ -79,7 +79,8 @@ class Server:
         print('Waiting for clients...')
         # interrompe l’esecuzione se da tastiera arriva la sequenza (CTRL + C)
         signal.signal(signal.SIGINT, self.signal_handler)
-        signal.pause()
+        while True:
+            time.sleep(1)
 
     def signal_handler(self, sig, frame):
         print('Exiting...')
