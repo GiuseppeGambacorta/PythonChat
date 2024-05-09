@@ -17,8 +17,7 @@ class structManager:
 
     def read_and_print_data(self, data):
         structure_data, message = self.read(data)
-        print(f'structure data: {structure_data}')
-        print(f'message: {message}')
+        
         return structure_data, message
 
     def write(self, structure_data, message):

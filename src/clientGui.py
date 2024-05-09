@@ -104,10 +104,11 @@ class ChatClient:
             while self.connected:
                 structure_data,response = self.client.printResponses()
                 self.chat_history.config(state='normal')
+                datatime = time.strftime('%H:%M:%S', time.localtime(structure_data[1]))
                 if str(structure_data[2].decode()).strip() == self.nickname:
-                    self.chat_history.insert(tk.END, "You: " + response.decode() + "\n")
+                    self.chat_history.insert(tk.END,  "You at " + str(datatime) + ":\n"  + response.decode() + "\n")
                 else:
-                    self.chat_history.insert(tk.END, str(structure_data[2].decode()).strip() + ": " + response.decode() + "\n")
+                    self.chat_history.insert(tk.END, str(structure_data[2].decode()).strip() + " at "  + str(datatime) + ":\n" + response.decode() + "\n")
                 self.status_text.see(tk.END)  
                 self.chat_history.config(state='disabled')
         except Exception as e:
