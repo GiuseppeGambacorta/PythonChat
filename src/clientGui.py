@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import scrolledtext
-from classClient import Client
+from client import Client
 import threading
 import time
 
@@ -78,6 +78,7 @@ class ChatClient:
                 self.nickname_selected = False
 
         except Exception as e:
+            print(f'Error: {e}')
             self.write_status(f'Error: {e} ')
             
     def write_message_to_server(self):
@@ -87,9 +88,11 @@ class ChatClient:
                 if len(message) > 0:
                     self.message_entry.delete(0, tk.END)
                     self.client.writeMessages(self.nickname, message)
-            else:
+            else:   
+                print(f'Error: {e} porcoddio')
                 self.write_status('cant send messages if not connected')
         except Exception as e:
+            print(f'Error: {e} ciaone')
             self.write_status(f'Error: {e}')
 
 
@@ -105,15 +108,16 @@ class ChatClient:
             while self.connected:
                 structure_data,response = self.client.readResponses()
                 self.chat_history.config(state='normal')
-                datatime = time.strftime('%H:%M:%S', time.localtime(structure_data[1]))
-                if str(structure_data[2].decode()).strip() == self.nickname:
+                datatime = time.strftime('%H:%M:%S', time.localtime(structure_data[0]))
+                if str(structure_data[1].decode()).strip() == self.nickname:
                     self.chat_history.insert(tk.END,  "You at " + str(datatime) + ":\n"  + response.decode() + "\n")
                 else:
-                    self.chat_history.insert(tk.END, str(structure_data[2].decode()).strip() + " at "  + str(datatime) + ":\n" + response.decode() + "\n")
+                    self.chat_history.insert(tk.END, str(structure_data[1].decode()).strip() + " at "  + str(datatime) + ":\n" + response.decode() + "\n")
                 self.status_text.see(tk.END)  
                 self.chat_history.config(state='disabled')
         except Exception as e:
             if self.connected:
+                print(f'Error: {e}')
                 self.write_status(f'Error: {e}')
                 self.connected = False
                 self.client.disconnect()
