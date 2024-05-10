@@ -17,8 +17,11 @@ class Client:
 
         self.local_messages = queue.Queue()
         self.local_messages_lock = threading.Lock()
+        
+        self.structure_manager = messages_struct.structManager()
     
     def listenMessages(self):
+            
         while True:
             try:
                 response = self.connectionSocket.recv(4096)
@@ -91,6 +94,8 @@ class Server:
                 
             print(f'Connected to {addr}')
             print(f'Number of Clients: {len(self.clients)}')
+        
+        print("listening for new clients thread  stopped")    
             
             
     def check_clients(self):
@@ -104,6 +109,8 @@ class Server:
                         print(f'Disconnected from {client.addr}')
                         print(f'Number of Clients: {len(self.clients)}')
             time.sleep(1)
+            
+        print("check client connection thred stopped")    
             
             
     def sendMessages(self):
@@ -128,6 +135,8 @@ class Server:
                     for time_stamp, message in data_store:
                         for client in self.clients:
                             client.send(message)
+        
+        print("send messages thred stopped") 
 
 
     def wait(self):
