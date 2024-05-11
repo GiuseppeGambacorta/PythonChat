@@ -66,15 +66,13 @@ class Server:
         self.structure_manager = messages_struct.structManager()
         
         self.server_on = True
-        
         self.thread_listen = threading.Thread(target=self.listen_for_new_clients)
-        self.thread2_check_client = threading.Thread(target=self.check_clients)
-        self.thread3_send = threading.Thread(target=self.sendMessages)
-        
+        self.thread_check_client = threading.Thread(target=self.check_clients)
+        self.thread_send = threading.Thread(target=self.send_messages)
         
         self.thread_listen.start()
-        self.thread2_check_client.start()
-        self.thread3_send.start()
+        self.thread_check_client.start()
+        self.thread_send.start()
         
         print(f"Server listening on port {port}...")
         
@@ -113,7 +111,7 @@ class Server:
         print("check client connection thred stopped")    
             
             
-    def sendMessages(self):
+    def send_messages(self):
         while self.server_on:
             if self.messages.empty():
                 time.sleep(0.1)
@@ -146,16 +144,17 @@ class Server:
             time.sleep(1)
             
     def signal_handler(self, sig, frame):
-        print('Exiting...')
-        self.server_on = False
-        self.thread_listen.join()
-        self.thread2_check_client.join()
-        self.thread3_send.join()
-        with self.clients_lock:
-            for client in self.clients:
-                    client.close_socket()
+        if self.server_on:
+            print('Exiting...')
+            self.server_on = False
+            self.thread_listen.join()
+            self.thread_check_client.join()
+            self.thread_send.join()
+            with self.clients_lock:
+                for client in self.clients:
+                        client.close_socket()
 
-        sys.exit(0)
+            sys.exit(0)
 
 if __name__ == '__main__':
 

@@ -35,7 +35,7 @@ class Client:
                 print(f'Errore di connessione: {e}')
                 return False
 
-    def readResponses(self):
+    def read_responses(self):
         try:
             data = self.client.recv(4096)
             return self.structure_manager.unpack_structure(data)   
@@ -47,7 +47,7 @@ class Client:
                 return False
           
 
-    def writeMessages(self, nickname,message):
+    def write_messages(self, nickname,message):
         try:
             name = nickname.ljust(self.structure_manager.get_max_string_length()).encode()
             structure_to_send=(time.time(),name)

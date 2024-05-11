@@ -87,12 +87,11 @@ class ChatClient:
                 message=self.message_entry.get()
                 if len(message) > 0:
                     self.message_entry.delete(0, tk.END)
-                    self.client.writeMessages(self.nickname, message)
+                    self.client.write_messages(self.nickname, message)
             else:   
-                print(f'Error: {e} porcoddio')
-                self.write_status('cant send messages if not connected')
+                self.write_status('can\'t send messages if not connected')
         except Exception as e:
-            print(f'Error: {e} ciaone')
+            print(f'Error: {e}')
             self.write_status(f'Error: {e}')
 
 
@@ -106,13 +105,15 @@ class ChatClient:
     def print_response(self):
         try:
             while self.connected:
-                structure_data,response = self.client.readResponses()
+                structure_data,response = self.client.read_responses()
                 self.chat_history.config(state='normal')
                 datatime = time.strftime('%H:%M:%S', time.localtime(structure_data[0]))
+                
                 if str(structure_data[1].decode()).strip() == self.nickname:
                     self.chat_history.insert(tk.END,  "You at " + str(datatime) + ":\n"  + response.decode() + "\n")
                 else:
                     self.chat_history.insert(tk.END, str(structure_data[1].decode()).strip() + " at "  + str(datatime) + ":\n" + response.decode() + "\n")
+
                 self.status_text.see(tk.END)  
                 self.chat_history.config(state='disabled')
         except Exception as e:
