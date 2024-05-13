@@ -29,8 +29,6 @@ class Client:
                 print(f'Error: {e} on client {self.connectionSocket} {self.addr}')
                 break
                 
-            ##QUIT
-              
             with self.local_messages_lock:
                 self.local_messages.put(response)
 
@@ -67,7 +65,7 @@ class Server:
         
         self.server_on = True
         self.thread_listen = threading.Thread(target=self.listen_for_new_clients)
-        self.thread_check_client = threading.Thread(target=self.check_clients)
+        self.thread_check_client = threading.Thread(target=self.check_clients_connection)
         self.thread_send = threading.Thread(target=self.send_messages)
         
         self.thread_listen.start()
@@ -96,7 +94,7 @@ class Server:
         print("listening for new clients thread  stopped")    
             
             
-    def check_clients(self):
+    def check_clients_connection(self):
         while self.server_on:
             with self.clients_lock:
                 for client, thread in self.client_threads:
@@ -127,14 +125,14 @@ class Server:
                     while not self.messages.empty():
                         message = self.messages.get()
                         data_structure,data = self.structure_manager.unpack_structure(message)
-                        data_store.append((data_structure[0], message))
-                    data_store.sort(key=lambda x: x[0])
+                        data_store.append((data_structure[0], message)) #in index 0 there is the timestamp
+                    data_store.sort(key=lambda x: x[0])                
 
                     for time_stamp, message in data_store:
                         for client in self.clients:
                             client.send(message)
         
-        print("send messages thred stopped") 
+        print("send messages thread stopped") 
 
 
     def wait(self):
