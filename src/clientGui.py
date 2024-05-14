@@ -44,7 +44,7 @@ class ChatClient:
         self.send_button = tk.Button(master, text="Send", command=self.write_message_to_server)
         self.send_button.grid(row=4, column=1, padx=10, pady=10)
 
-
+    # Connect to the server, if the connection is successful, start the thread that reads the server's responses
     def connect(self):
         if not self.connected:
             try:
@@ -94,7 +94,7 @@ class ChatClient:
             print(f'Error: {e}')
             self.write_status(f'Error: {e}')
 
-
+    # Write the status messages in the status text box
     def write_status(self, message):
         self.status_text.config(state='normal')
         message = time.strftime('%H:%M:%S') + ": " + message
@@ -102,6 +102,7 @@ class ChatClient:
         self.status_text.see(tk.END)  
         self.status_text.config(state='disabled')
 
+    # Read the server's responses and print them in the chat history
     def print_response(self):
         try:
             while self.connected:

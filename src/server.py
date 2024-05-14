@@ -74,17 +74,17 @@ class Server:
         
         print(f"Server listening on port {port}...")
         
-        
+    # Method to listen for new clients, it creates a new client object and a new thread for each client
     def listen_for_new_clients(self):
         while self.server_on:
             try:
                 connectionSocket, addr = self.server.accept()
-            except socket.timeout:
+            except socket.timeout: #Added a timeout for the accept method, so that the server can check if it is still running and stop the thread
                 continue
             client = Client(connectionSocket, addr)
+            thread = threading.Thread(target=client.listenMessages)
+            thread.start()
             with self.clients_lock:
-                thread = threading.Thread(target=client.listenMessages)
-                thread.start()
                 self.clients.append(client)
                 self.client_threads.append((client, thread))
                 
@@ -93,7 +93,7 @@ class Server:
         
         print("listening for new clients thread  stopped")    
             
-            
+    # Method to check if the clients are still connected, if not it closes the socket and removes the client from the list
     def check_clients_connection(self):
         while self.server_on:
             with self.clients_lock:
@@ -108,7 +108,7 @@ class Server:
             
         print("check client connection thred stopped")    
             
-            
+    # Method to send messages to the clients, it checks if there are messages in the queue and sends them to the clients
     def send_messages(self):
         while self.server_on:
             if self.messages.empty():
@@ -126,7 +126,7 @@ class Server:
                         message = self.messages.get()
                         data_structure,data = self.structure_manager.unpack_structure(message)
                         data_store.append((data_structure[0], message)) #in index 0 there is the timestamp
-                    data_store.sort(key=lambda x: x[0])                
+                    data_store.sort(key=lambda x: x[0]) #sort the messages by timestamp
 
                     for time_stamp, message in data_store:
                         for client in self.clients:
@@ -140,7 +140,8 @@ class Server:
         signal.signal(signal.SIGINT, self.signal_handler)
         while True:
             time.sleep(1)
-            
+    
+           
     def signal_handler(self, sig, frame):
         if self.server_on:
             print('Exiting...')

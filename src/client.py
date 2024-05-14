@@ -35,6 +35,7 @@ class Client:
                 print(f'Errore di connessione: {e}')
                 return False
 
+    # Read the response from the server, unpack the structure and return the communication strcuture and the message
     def read_responses(self):
         try:
             data = self.client.recv(4096)
@@ -46,7 +47,7 @@ class Client:
                 print(f'Errore di connessione: {e}')
                 return False
           
-
+    # Write the message to the server, pack the structure and send the message
     def write_messages(self, nickname,message):
         try:
             name = nickname.ljust(self.structure_manager.get_max_string_length()).encode()
